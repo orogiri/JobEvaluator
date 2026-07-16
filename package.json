@@ -62,7 +62,8 @@
     "publish": {
       "provider": "github",
       "owner": "orogiri",
-      "repo": "JobEvaluator"
+      "repo": "JobEvaluator",
+      "releaseType": "release"
     }
   }
 }
