@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node other_factors.mjs)",
+      "Bash(node combined_cv.mjs)",
+      "Bash(node -e ' *)",
+      "Bash(node -e \"let d='';process.stdin.on\\('data',c=>d+=c\\);process.stdin.on\\('end',\\(\\)=>{const j=JSON.parse\\(d\\); console.log\\('count:',j.length\\); if\\(j[0]\\) console.log\\('sample keys:', Object.keys\\(j[0]\\).includes\\('posted_date'\\)\\);}\\)\")",
+      "Bash(node --check routes/coverLetters.js)",
+      "Bash(node --check llm/text.js)",
+      "Bash(node --check llm/prompts.js)",
+      "Bash(node --check db.js)",
+      "Bash(node --check index.js)",
+      "Bash(curl -s -X POST http://localhost:3002/api/cover-letters/templates -H \"Content-Type: application/json\" -d '{\"name\":\"Test Template\",\"body\":\"Write a short professional cover letter. Paragraph 1: hook. Paragraph 2: evidence. Paragraph 3: close.\"}')",
+      "Bash(curl -s http://localhost:3002/api/cover-letters/templates)",
+      "Bash(curl -s http://localhost:3002/api/cover-letters)",
+      "Bash(curl -s -X DELETE http://localhost:3002/api/cover-letters/1)",
+      "Bash(curl -s -X DELETE http://localhost:3002/api/cover-letters/templates/1)",
+      "Bash(node --check routes/jobs.js)",
+      "Bash(curl -s http://localhost:3002/api/jobs/506)",
+      "Bash(curl -s -X DELETE http://localhost:3002/api/cover-letters/2)",
+      "Bash(curl -s -X DELETE http://localhost:3002/api/cover-letters/templates/4)",
+      "Bash(node -e \"let d='';process.stdin.on\\('data',c=>d+=c\\);process.stdin.on\\('end',\\(\\)=>{console.log\\('templates:', JSON.parse\\(d\\).map\\(t=>t.name\\)\\);}\\)\")",
+      "Bash(node -e \"let d='';process.stdin.on\\('data',c=>d+=c\\);process.stdin.on\\('end',\\(\\)=>{console.log\\('cover letters remaining:', JSON.parse\\(d\\).length\\);}\\)\")"
+    ]
+  }
+}

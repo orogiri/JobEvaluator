@@ -1,0 +1,55 @@
+{
+  "name": "job-evaluator",
+  "version": "1.0.0",
+  "private": true,
+  "main": "electron/main.cjs",
+  "scripts": {
+    "dev": "concurrently --names SERVER,CLIENT --prefix-colors cyan,yellow \"npm run dev --prefix server\" \"npm run dev --prefix client\"",
+    "install:all": "npm install && npm install --prefix server && npm install --prefix client",
+    "electron:dev": "concurrently --names SERVER,CLIENT,ELECTRON --prefix-colors cyan,yellow,magenta --kill-others \"npm run dev --prefix server\" \"npm run dev --prefix client\" \"wait-on tcp:2888 && electron .\"",
+    "electron:build": "npm run build --prefix client && electron-builder",
+    "electron:release": "npm run build --prefix client && electron-builder --publish always"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "electron": "^33.0.0",
+    "electron-builder": "^25.1.8",
+    "wait-on": "^7.2.0"
+  },
+  "dependencies": {
+    "electron-updater": "^6.3.9"
+  },
+  "build": {
+    "appId": "com.jackhudd.jobevaluator",
+    "productName": "Job Evaluator",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "electron/**/*",
+      "server/**/*",
+      "client/dist/**/*",
+      "!server/data.db",
+      "!server/data.db-journal",
+      "!server/db.sqlite",
+      "!**/*.map"
+    ],
+    "asarUnpack": [
+      "server/node_modules/sql.js/dist/*.wasm"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "build/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true
+    },
+    "publish": {
+      "provider": "github",
+      "owner": "REPLACE_WITH_GITHUB_USERNAME",
+      "repo": "REPLACE_WITH_REPO_NAME"
+    }
+  }
+}

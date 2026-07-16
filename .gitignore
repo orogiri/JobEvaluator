@@ -1,0 +1,21 @@
+node_modules/
+dist/
+dist-electron/
+release/
+
+# Per-install data — each machine/user keeps its own, never synced via git
+server/data.db
+server/data.db-journal
+server/db.sqlite
+server/db.sqlite-journal
+
+# Personal files, not meant to ship
+upload/
+
+# Editor/OS
+.DS_Store
+Thumbs.db
+
+# Env/secrets
+.env
+.env.local
