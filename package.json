@@ -27,15 +27,28 @@
     },
     "files": [
       "electron/**/*",
-      "server/**/*",
-      "client/dist/**/*",
-      "!server/data.db",
-      "!server/data.db-journal",
-      "!server/db.sqlite",
       "!**/*.map"
     ],
-    "asarUnpack": [
-      "server/node_modules/sql.js/dist/*.wasm"
+    "extraResources": [
+      {
+        "from": "server",
+        "to": "server",
+        "filter": [
+          "**/*",
+          "!data.db",
+          "!data.db-journal",
+          "!db.sqlite"
+        ]
+      },
+      {
+        "from": "client/dist",
+        "to": "client/dist",
+        "filter": ["**/*"]
+      },
+      {
+        "from": "build/icon.ico",
+        "to": "build/icon.ico"
+      }
     ],
     "win": {
       "target": "nsis",
