@@ -61,8 +61,8 @@
     },
     "publish": {
       "provider": "github",
-      "owner": "REPLACE_WITH_GITHUB_USERNAME",
-      "repo": "REPLACE_WITH_REPO_NAME"
+      "owner": "orogiri",
+      "repo": "JobEvaluator"
     }
   }
 }
