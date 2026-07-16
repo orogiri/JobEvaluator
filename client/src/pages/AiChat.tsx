@@ -44,7 +44,7 @@ export function AiChatPage() {
   const [messages, setMessages]               = useState<Message[]>([]);
   const [input, setInput]                     = useState('');
   const [provider, setProvider]               = useState<Provider>('openai');
-  const [model, setModel]                     = useState('gpt-5.6-terra');
+  const [model, setModel]                     = useState('gpt-5.6-luna');
   const [allModels, setAllModels]             = useState<Record<Provider, ModelOption[]>>({ anthropic: [], openai: [], deepseek: [], qwen: [] });
   const [loading, setLoading]                 = useState(false);
   const [error, setError]                     = useState('');
@@ -90,13 +90,13 @@ export function AiChatPage() {
 
   function handleProviderChange(p: Provider) {
     setProvider(p);
-    setModel(allModels[p]?.[0]?.id ?? '');
+    setModel(allModels[p]?.find(m => m.recommended)?.id ?? allModels[p]?.[0]?.id ?? '');
   }
 
   function loadSession(s: Session) {
     setCurrentId(s.id);
     setProvider((s.provider as Provider) || 'openai');
-    setModel(s.model || 'gpt-5.6-terra');
+    setModel(s.model || 'gpt-5.6-luna');
     setError('');
     // Fetch full messages for this session
     apiFetch<Session & { messages: Message[] }>(`/api/chat/sessions/${s.id}`)

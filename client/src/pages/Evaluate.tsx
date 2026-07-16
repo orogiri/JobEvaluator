@@ -30,7 +30,7 @@ export function EvaluatePage() {
 
   const [selectedResumeId, setSelectedResumeId] = useState<number | ''>('');
   const [provider, setProvider] = useState<Provider>('openai');
-  const [model, setModel] = useState('gpt-5.6-terra');
+  const [model, setModel] = useState('gpt-5.6-luna');
   const [jdText, setJdText] = useState('');
   const [estimate, setEstimate] = useState<CostEstimate | null>(null);
   const [estimating, setEstimating] = useState(false);
@@ -41,7 +41,7 @@ export function EvaluatePage() {
   const [normPercentile, setNormPercentile] = useState<number | null>(null);
   const [salaryBenchmark, setSalaryBenchmark] = useState<SalaryBenchmark | null>(null);
   const [includeSuggestions, setIncludeSuggestions] = useState(false);
-  const [includeFieldDb, setIncludeFieldDb] = useState(true);
+  const [includeFieldDb, setIncludeFieldDb] = useState(false);
 
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -52,19 +52,11 @@ export function EvaluatePage() {
       setModels(m);
       if (r.length > 0) setSelectedResumeId(r[0].id);
       const lastProvider = (s.last_provider as Provider) || 'openai';
-      const lastModel = s.last_model || 'gpt-5.6-terra';
+      const lastModel = s.last_model || 'gpt-5.6-luna';
       setProvider(lastProvider);
       setModel(lastModel);
     });
   }, []);
-
-  // Default includeFieldDb based on selected resume's category (off for FP&A, on for others)
-  useEffect(() => {
-    const resume = resumes.find(r => r.id === selectedResumeId);
-    if (resume) {
-      setIncludeFieldDb(!/fp[&\s]?a\b/i.test(resume.category_name));
-    }
-  }, [selectedResumeId, resumes]);
 
   // Auto-estimate when inputs change
   useEffect(() => {
@@ -95,7 +87,7 @@ export function EvaluatePage() {
 
   function handleProviderChange(p: Provider) {
     setProvider(p);
-    setModel(models[p]?.[0]?.id ?? '');
+    setModel(models[p]?.find(m => m.recommended)?.id ?? models[p]?.[0]?.id ?? '');
   }
 
   async function handleSubmit() {
@@ -254,7 +246,7 @@ export function EvaluatePage() {
               Map to field database
             </span>
             <p className="text-xs text-gray-400 mt-0.5">
-              The LLM will compare against and update the shared field database for this resume category. Increases cost. Off by default for FP&A due to the large number of accumulated fields.
+              The LLM will compare against and update the shared field database for this resume category. Increases cost. Off by default.
             </p>
           </div>
         </label>

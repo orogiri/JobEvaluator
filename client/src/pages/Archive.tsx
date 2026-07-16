@@ -157,7 +157,7 @@ export function ArchivePage() {
 
   const [allModels, setAllModels]               = useState<Record<Provider, ModelOption[]>>({ anthropic: [], openai: [], deepseek: [], qwen: [] });
   const [refreshProvider, setRefreshProvider]   = useState<Provider>('openai');
-  const [refreshModel, setRefreshModel]         = useState('gpt-5.6-terra');
+  const [refreshModel, setRefreshModel]         = useState('gpt-5.6-luna');
   const [estimates, setEstimates]               = useState<Record<number, number>>({});
   const [totalCost, setTotalCost]               = useState<number | null>(null);
   const [refreshing, setRefreshing]             = useState<Set<number>>(new Set());
@@ -234,7 +234,7 @@ export function ArchivePage() {
 
   function handleProviderChange(p: Provider) {
     setRefreshProvider(p);
-    setRefreshModel(p === 'openai' ? 'gpt-5.6-terra' : (allModels[p]?.[0]?.id ?? ''));
+    setRefreshModel(allModels[p]?.find(m => m.recommended)?.id ?? allModels[p]?.[0]?.id ?? '');
   }
 
   async function handleRefreshOne(e: Evaluation, ev: React.MouseEvent) {

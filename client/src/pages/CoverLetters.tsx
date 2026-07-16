@@ -70,7 +70,7 @@ export function CoverLettersPage() {
   const [resumeId, setResumeId] = useState<number | ''>('');
   const [templateId, setTemplateId] = useState<number | ''>('');
   const [provider, setProvider] = useState<Provider>('openai');
-  const [model, setModel] = useState('gpt-5.6-terra');
+  const [model, setModel] = useState('gpt-5.6-luna');
   const [thinking, setThinking] = useState(false);
 
   const [estimate, setEstimate] = useState<CostEstimate | null>(null);
@@ -172,7 +172,7 @@ export function CoverLettersPage() {
         const uj = getUniqueJobs(j);
         if (uj.length > 0) setJobId(uj[0].job_id);
         const lastProvider = (s.last_provider as Provider) || 'openai';
-        const lastModel = s.last_model || 'gpt-5.6-terra';
+        const lastModel = s.last_model || 'gpt-5.6-luna';
         setProvider(lastProvider);
         setModel(lastModel);
         setResearchModel(m.anthropic?.find(x => x.recommended)?.id ?? m.anthropic?.[0]?.id ?? '');
@@ -188,7 +188,7 @@ export function CoverLettersPage() {
 
   function handleProviderChange(p: Provider) {
     setProvider(p);
-    setModel(allModels[p]?.[0]?.id ?? '');
+    setModel(allModels[p]?.find(m => m.recommended)?.id ?? allModels[p]?.[0]?.id ?? '');
   }
 
   // Auto-estimate cost when inputs change

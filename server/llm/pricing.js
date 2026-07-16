@@ -38,14 +38,14 @@ export const AVAILABLE_MODELS = {
   ],
   openai: [
     { id: 'gpt-5.6-sol',   label: 'GPT-5.6 Sol', thinking: true },
-    { id: 'gpt-5.6-terra', label: 'GPT-5.6 Terra', recommended: true, thinking: true },
-    { id: 'gpt-5.6-luna',  label: 'GPT-5.6 Luna', thinking: true },
+    { id: 'gpt-5.6-terra', label: 'GPT-5.6 Terra', thinking: true },
+    { id: 'gpt-5.6-luna',  label: 'GPT-5.6 Luna', recommended: true, thinking: true },
     { id: 'gpt-5.4-mini',  label: 'GPT-5.4 Mini', thinking: true },
     { id: 'gpt-5.4-nano',  label: 'GPT-5.4 Nano', thinking: true },
   ],
   deepseek: [
-    { id: 'deepseek-v4-flash', label: 'DeepSeek V4 Flash', recommended: true, thinking: true },
-    { id: 'deepseek-v4-pro',   label: 'DeepSeek V4 Pro', thinking: true },
+    { id: 'deepseek-v4-flash', label: 'DeepSeek V4 Flash', thinking: true },
+    { id: 'deepseek-v4-pro',   label: 'DeepSeek V4 Pro', recommended: true, thinking: true },
   ],
   qwen: [
     { id: 'qwen3.7-max',   label: 'Qwen3.7-Max', thinking: true },
