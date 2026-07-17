@@ -33,13 +33,12 @@ jobs:
       - name: Skip if this version was already released
         id: check
         shell: pwsh
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release view "v${{ steps.pkg.outputs.version }}" 2>$null
-          if ($LASTEXITCODE -eq 0) {
+          $tag = "v${{ steps.pkg.outputs.version }}"
+          try {
+            Invoke-RestMethod -Uri "https://api.github.com/repos/${{ github.repository }}/releases/tags/$tag" -ErrorAction Stop | Out-Null
             echo "skip=true" >> $env:GITHUB_OUTPUT
-          } else {
+          } catch {
             echo "skip=false" >> $env:GITHUB_OUTPUT
           }
 
