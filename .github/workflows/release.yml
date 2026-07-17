@@ -48,6 +48,7 @@ jobs:
 
       - name: Build and publish release
         if: steps.check.outputs.skip == 'false'
+        timeout-minutes: 12
         run: npm run electron:release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
