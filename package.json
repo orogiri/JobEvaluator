@@ -37,7 +37,9 @@
           "**/*",
           "!data.db",
           "!data.db-journal",
-          "!db.sqlite"
+          "!db.sqlite",
+          "!**/node_modules/job-evaluator",
+          "!**/node_modules/job-evaluator/**"
         ]
       },
       {
