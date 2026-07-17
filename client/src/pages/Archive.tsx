@@ -81,6 +81,16 @@ function pickEval(group: Evaluation[], scoreModel: string): Evaluation {
   return group.reduce((a, b) => (new Date(a.created_at) >= new Date(b.created_at) ? a : b));
 }
 
+// Key identifying the same physical job across job_id rows — e.g. the same JD
+// pasted into Evaluate more than once, which creates a new job_id each time.
+// Company+title when both are present; falls back to a JD-text prefix so
+// blank-metadata evals still merge.
+function jobDedupKey(e: Evaluation): string {
+  return (e.company && e.title)
+    ? `ct:${e.company.toLowerCase().trim()}\x00${e.title.toLowerCase().trim()}`
+    : `jd:${(e.jd_text || '').slice(0, 400).trim()}` || `id:${e.job_id}`;
+}
+
 function salaryMid(e: Evaluation) {
   if (e.salary_min != null && e.salary_max != null) return (e.salary_min + e.salary_max) / 2;
   if (e.salary_min != null) return e.salary_min;
@@ -400,9 +410,7 @@ export function ArchivePage() {
     }
     if (!rep) continue;
 
-    const key = (rep.company && rep.title)
-      ? `ct:${rep.company.toLowerCase().trim()}\x00${rep.title.toLowerCase().trim()}`
-      : `jd:${(rep.jd_text || '').slice(0, 400).trim()}` || `id:${rep.job_id}`;
+    const key = jobDedupKey(rep);
 
     const existing = seen.get(key);
     if (!existing || new Date(rep.created_at) > new Date(existing.created_at)) {
@@ -411,6 +419,15 @@ export function ArchivePage() {
   }
 
   const deduped = [...seen.values()];
+
+  // All evaluations that represent the same physical job as a given evaluation,
+  // regardless of job_id — used by the detail panel's evaluation picker.
+  const byJobKey = new Map<string, Evaluation[]>();
+  for (const e of evals) {
+    const k = jobDedupKey(e);
+    if (!byJobKey.has(k)) byJobKey.set(k, []);
+    byJobKey.get(k)!.push(e);
+  }
 
   const filtered = deduped.filter(e => {
     if (filterCategory && e.category_name !== filterCategory) return false;
@@ -812,7 +829,7 @@ export function ArchivePage() {
                     <X size={16} />
                   </button>
                   {(() => {
-                    const jobEvals = byJobId.get(selected.job_id) ?? [selected];
+                    const jobEvals = byJobKey.get(jobDedupKey(selected)) ?? [selected];
                     if (jobEvals.length <= 1) return null;
                     const sorted = [...jobEvals].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
                     return (
