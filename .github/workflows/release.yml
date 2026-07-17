@@ -42,6 +42,15 @@ jobs:
             echo "skip=false" >> $env:GITHUB_OUTPUT
           }
 
+      - name: Disable Windows Defender real-time scanning
+        # NSIS (the installer builder) writes and executes many small files in
+        # quick succession, which Defender's real-time scanning on GitHub's
+        # Windows runners can stall on for many minutes. Safe here since this
+        # VM is discarded immediately after the job finishes.
+        if: steps.check.outputs.skip == 'false'
+        shell: pwsh
+        run: Set-MpPreference -DisableRealtimeMonitoring $true
+
       - name: Install dependencies
         if: steps.check.outputs.skip == 'false'
         run: npm run install:all
