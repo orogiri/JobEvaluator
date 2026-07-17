@@ -56,6 +56,10 @@ function MeetsBadge({ value }: { value: string }) {
   return <span className={`inline-block rounded px-1.5 py-0.5 text-xs font-semibold ${color}`}>{value}</span>;
 }
 
+function providerLabel(provider: string): string {
+  return provider === 'anthropic' ? 'Anthropic' : provider === 'qwen' ? 'Qwen' : provider === 'deepseek' ? 'DeepSeek' : 'OpenAI';
+}
+
 function fmtCost(cost: number | undefined): string {
   if (cost == null) return '…';
   if (cost < 0.0001) return '< $0.0001';
@@ -807,6 +811,35 @@ export function ArchivePage() {
                   >
                     <X size={16} />
                   </button>
+                  {(() => {
+                    const jobEvals = byJobId.get(selected.job_id) ?? [selected];
+                    if (jobEvals.length <= 1) return null;
+                    const sorted = [...jobEvals].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+                    return (
+                      <div className="mb-4 max-w-md">
+                        <label className="block text-xs text-gray-500 mb-1">
+                          This job has {jobEvals.length} evaluations — viewing:
+                        </label>
+                        <select
+                          className={inputCls}
+                          value={selected.id}
+                          onChange={e => {
+                            const next = jobEvals.find(ev => ev.id === Number(e.target.value));
+                            if (next) setSelected(next);
+                          }}
+                        >
+                          {sorted.map(ev => {
+                            const label = allModels[ev.llm_provider as Provider]?.find(m => m.id === ev.llm_model)?.label ?? ev.llm_model;
+                            return (
+                              <option key={ev.id} value={ev.id}>
+                                {providerLabel(ev.llm_provider)}: {label} — {new Date(ev.created_at).toLocaleString()}
+                              </option>
+                            );
+                          })}
+                        </select>
+                      </div>
+                    );
+                  })()}
                   <EvaluationDetail
                     evaluation={selected}
                     weights={settings.weights}

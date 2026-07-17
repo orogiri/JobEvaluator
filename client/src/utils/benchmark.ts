@@ -1,5 +1,5 @@
 import type { BenchmarkImport, Evaluation } from '../types';
-import { normalizeLevel } from '../types';
+import { normalizeLevel, dedupeJobs } from '../types';
 
 export function salaryMid(e: Evaluation): number | null {
   if (e.salary_min != null && e.salary_max != null) return (e.salary_min + e.salary_max) / 2;
@@ -64,7 +64,7 @@ export interface BenchmarkPoint {
 }
 
 export function evalToBenchmarkPoints(evals: Evaluation[]): BenchmarkPoint[] {
-  return evals
+  return dedupeJobs(evals)
     .filter(e => e.years_experience != null && salaryMid(e) != null)
     .map(e => ({
       x: e.years_experience!,

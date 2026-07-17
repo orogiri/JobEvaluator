@@ -5,7 +5,7 @@ import {
 } from 'recharts';
 import { getJobs, getSettings } from '../api/client';
 import type { AppSettings, Evaluation, Weights } from '../types';
-import { computeOverallScore } from '../types';
+import { computeOverallScore, dedupeJobs } from '../types';
 
 const PIE_COLORS = [
   '#3b82f6', '#8b5cf6', '#f97316', '#10b981',
@@ -64,17 +64,6 @@ interface StageStat {
   industry: number | null;
 }
 
-function pickEval(group: Evaluation[], scoreModel: string): Evaluation {
-  if (scoreModel) {
-    const sep      = scoreModel.indexOf(':');
-    const provider = scoreModel.slice(0, sep);
-    const model    = scoreModel.slice(sep + 1);
-    const match    = group.find(e => e.llm_provider === provider && e.llm_model === model);
-    if (match) return match;
-  }
-  return group.reduce((a, b) => (new Date(a.created_at) >= new Date(b.created_at) ? a : b));
-}
-
 export function AnalyticsPage() {
   const [evals, setEvals]       = useState<Evaluation[]>([]);
   const [settings, setSettings] = useState<AppSettings | null>(null);
@@ -99,21 +88,11 @@ export function AnalyticsPage() {
     [evals]
   );
 
-  // Deduplicate by job_id before applying any filters
+  // Deduplicate to one evaluation per physical job before applying any filters
+  // (both same-job_id re-evaluations and the same JD pasted multiple times).
   const dedupedEvals = useMemo(() => {
-    const groups = new Map<number, Evaluation[]>();
-    for (const e of evals) {
-      if (!groups.has(e.job_id)) groups.set(e.job_id, []);
-      groups.get(e.job_id)!.push(e);
-    }
-    return [...groups.values()].map(g => {
-      if (filterResume) {
-        const subset = g.filter(e => e.resume_id === filterResume);
-        if (subset.length === 0) return null;
-        return pickEval(subset, scoreModel);
-      }
-      return pickEval(g, scoreModel);
-    }).filter((e): e is Evaluation => e !== null);
+    const source = filterResume ? evals.filter(e => e.resume_id === filterResume) : evals;
+    return dedupeJobs(source, scoreModel);
   }, [evals, scoreModel, filterResume]);
 
   const categories   = useMemo(() => [...new Set(dedupedEvals.map(e => e.category_name))].sort(), [dedupedEvals]);

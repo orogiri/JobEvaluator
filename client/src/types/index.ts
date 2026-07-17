@@ -261,6 +261,44 @@ export function normalizeLevel(title: string | null | undefined): string | null 
   return null;
 }
 
+// Collapses evaluations down to one representative per physical job, so a job
+// evaluated multiple times (via re-evaluate/AI Compare against a different
+// resume or model, or the same JD pasted into Evaluate more than once) counts
+// once in aggregates/benchmarks instead of once per evaluation. Within each
+// job_id, picks scoreModel's evaluation if given (format "provider:model"),
+// else the most recent; job_ids representing the same physical job (matched
+// by company+title, or a JD-text prefix when metadata is blank) are then
+// merged the same way, keeping the more recent one.
+export function dedupeJobs(evals: Evaluation[], scoreModel?: string): Evaluation[] {
+  const byJobId = new Map<number, Evaluation[]>();
+  for (const e of evals) {
+    if (!byJobId.has(e.job_id)) byJobId.set(e.job_id, []);
+    byJobId.get(e.job_id)!.push(e);
+  }
+
+  const sep      = scoreModel ? scoreModel.indexOf(':') : -1;
+  const provider = sep >= 0 ? scoreModel!.slice(0, sep) : '';
+  const model    = sep >= 0 ? scoreModel!.slice(sep + 1) : '';
+
+  const seen = new Map<string, Evaluation>();
+  for (const group of byJobId.values()) {
+    const rep = scoreModel
+      ? (group.find(e => e.llm_provider === provider && e.llm_model === model)
+         ?? group.reduce((a, b) => (new Date(a.created_at) >= new Date(b.created_at) ? a : b)))
+      : group.reduce((a, b) => (new Date(a.created_at) >= new Date(b.created_at) ? a : b));
+
+    const key = (rep.company && rep.title)
+      ? `ct:${rep.company.toLowerCase().trim()}\x00${rep.title.toLowerCase().trim()}`
+      : `jd:${(rep.jd_text || '').slice(0, 400).trim()}` || `id:${rep.job_id}`;
+
+    const existing = seen.get(key);
+    if (!existing || new Date(rep.created_at) > new Date(existing.created_at)) {
+      seen.set(key, rep);
+    }
+  }
+  return [...seen.values()];
+}
+
 export function computeOverallScore(eval_: Evaluation, weights: Weights): number {
   const { score_duties, score_requirements, score_years_experience, score_skills, score_industry } = eval_;
   if (score_duties == null || score_requirements == null ||
