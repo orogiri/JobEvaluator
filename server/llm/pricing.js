@@ -1,4 +1,4 @@
-// Prices in USD per 1M tokens (input / output). Updated 2026-07-14.
+// Prices in USD per 1M tokens (input / output). Updated 2026-07-17.
 const PRICING = {
   anthropic: {
     'claude-opus-4-8':           { input: 5.00, output: 25.00 },
@@ -13,6 +13,7 @@ const PRICING = {
     'gpt-5.6-luna':  { input: 1.00, output: 6.00  },
     'gpt-5.4-mini':  { input: 0.75, output: 4.50  },
     'gpt-5.4-nano':  { input: 0.20, output: 1.25  },
+    'gpt-5.1':       { input: 1.25, output: 10.00 },
   },
   // DeepSeek pricing (USD per 1M tokens; cache-miss input rate)
   deepseek: {
@@ -42,6 +43,7 @@ export const AVAILABLE_MODELS = {
     { id: 'gpt-5.6-luna',  label: 'GPT-5.6 Luna', recommended: true, thinking: true },
     { id: 'gpt-5.4-mini',  label: 'GPT-5.4 Mini', thinking: true },
     { id: 'gpt-5.4-nano',  label: 'GPT-5.4 Nano', thinking: true },
+    { id: 'gpt-5.1',       label: 'GPT-5.1', thinking: true },
   ],
   deepseek: [
     { id: 'deepseek-v4-flash', label: 'DeepSeek V4 Flash', thinking: true },
